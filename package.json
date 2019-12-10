@@ -1,0 +1,22 @@
+{
+  "name": "rdr-pma",
+  "version": "1.0.0",
+  "description": "RADAR Parity Mempool Aggregator",
+  "author": "Anthony Umfer",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "run": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "ioredis": "^4.14.1",
+    "lodash": "^4.17.15",
+    "rxjs": "^6.5.3",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/ioredis": "^4.14.1",
+    "@types/lodash": "^4.14.149",
+    "@types/socket.io": "^2.1.4"
+  }
+}
