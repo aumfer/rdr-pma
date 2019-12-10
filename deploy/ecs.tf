@@ -124,8 +124,8 @@ resource "aws_ecs_service" "default" {
 
   # workaround for https://github.com/hashicorp/terraform/issues/12634
   depends_on = [
-    "aws_lb_listener.http",
-    "aws_lb_listener.https",
+    aws_lb_listener.http,
+    aws_lb_listener.https,
   ]
 }
 
@@ -137,6 +137,11 @@ resource "aws_lb_target_group" "ecs_http" {
   vpc_id      = data.aws_vpc.vpc.id
 
   tags = module.tags.tags
+
+  # workaround for https://github.com/cds-snc/aws-ecs-fargate/issues/1
+  depends_on = [
+      aws_lb.main
+  ]
 }
 
 resource "aws_lb_target_group" "ecs_https" {
@@ -147,4 +152,9 @@ resource "aws_lb_target_group" "ecs_https" {
   vpc_id      = data.aws_vpc.vpc.id
 
   tags = module.tags.tags
+
+  # workaround for https://github.com/cds-snc/aws-ecs-fargate/issues/1
+  depends_on = [
+      aws_lb.main
+  ]
 }
