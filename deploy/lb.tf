@@ -32,23 +32,28 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.ecs_http.arn
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
+}
+
+data "aws_acm_certificate" "cert" {
+  domain   = "*.alteredco.com"
 }
 
 resource "aws_lb_listener" "https" {
   load_balancer_arn = "${aws_lb.main.arn}"
   port              = "443"
-  protocol          = "HTTP"
+  protocol          = "HTTPS"
+  certificate_arn   = data.aws_acm_certificate.cert.arn
 
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "80"
-      protocol    = "HTTP"
-      status_code = "HTTP_301"
-    }
+    type = "forward"
+    target_group_arn = aws_lb_target_group.ecs_https.arn
   }
 }

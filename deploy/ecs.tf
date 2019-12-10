@@ -131,3 +131,13 @@ resource "aws_lb_target_group" "ecs_http" {
 
   tags = module.tags.tags
 }
+
+resource "aws_lb_target_group" "ecs_https" {
+  name        = "${var.repo_name}-${var.branch_name}-1"
+  port        = 443
+  protocol    = "HTTPS"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.vpc.id
+
+  tags = module.tags.tags
+}
