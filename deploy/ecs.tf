@@ -30,7 +30,7 @@ module "container_definition" {
     {
       name = "REDIS_URL"
       # todo configuration management
-      value = "rdr-pmp-git-master.vvthzk.0001.use1.cache.amazonaws.com"
+      value = "redis://rdr-pmp-git-master.vvthzk.0001.use1.cache.amazonaws.com:6379"
     }
   ]
 }
