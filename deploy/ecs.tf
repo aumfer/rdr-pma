@@ -55,6 +55,24 @@ resource "aws_ecs_task_definition" "default" {
   tags                     = module.tags.tags
 }
 
+resource "aws_security_group_rule" "allow_http_ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.security_group.id
+}
+
+resource "aws_security_group_rule" "allow_https_ingress" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.security_group.id
+}
+
 resource "aws_security_group_rule" "allow_all_egress" {
   type              = "egress"
   from_port         = 0
@@ -79,12 +97,28 @@ resource "aws_ecs_service" "default" {
   propagate_tags = "SERVICE"
 
   network_configuration {
-    security_groups  = ["${aws_security_group.security_group.id}"]
+    security_groups  = [aws_security_group.security_group.id]
     subnets          = data.aws_subnet_ids.subnets.ids
     assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.ecs_json_rpc.arn
+    container_name   = "${var.repo_name}-${var.branch_name}"
+    container_port   = "80"
   }
 
   lifecycle {
     ignore_changes = [desired_count]
   }
+}
+
+resource "aws_lb_target_group" "ecs_http" {
+  name        = "${var.repo_name}-${var.branch_name}-0"
+  port        = 80
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.vpc.id
+
+  tags = module.tags.tags
 }
