@@ -17,11 +17,7 @@ module "container_definition" {
     {
       containerPort = 80
       protocol      = "tcp"
-    },
-    {
-      containerPort = 443
-      protocol      = "tcp"
-    },
+    }
   ]
 
   log_options = {
@@ -117,16 +113,10 @@ resource "aws_ecs_service" "default" {
     assign_public_ip = true
   }
 
-  #load_balancer {
-  #  target_group_arn = aws_lb_target_group.ecs_http.arn
-  #  container_name   = "${var.repo_name}-${var.branch_name}"
-  #  container_port   = "80"
-  #}
-
   load_balancer {
-    target_group_arn = aws_lb_target_group.ecs_https.arn
+    target_group_arn = aws_lb_target_group.ecs_http.arn
     container_name   = "${var.repo_name}-${var.branch_name}"
-    container_port   = "443"
+    container_port   = "80"
   }
 
   lifecycle {
@@ -140,25 +130,10 @@ resource "aws_ecs_service" "default" {
   ]
 }
 
-#resource "aws_lb_target_group" "ecs_http" {
-#  name        = "${var.repo_name}-${var.branch_name}-0"
-#  port        = 80
-#  protocol    = "HTTP"
-#  target_type = "ip"
-#  vpc_id      = data.aws_vpc.vpc.id
-#
-#  tags = module.tags.tags
-#
-#  # workaround for https://github.com/cds-snc/aws-ecs-fargate/issues/1
-#  depends_on = [
-#      aws_lb.main
-#  ]
-#}
-
-resource "aws_lb_target_group" "ecs_https" {
-  name        = "${var.repo_name}-${var.branch_name}-1"
-  port        = 443
-  protocol    = "HTTPS"
+resource "aws_lb_target_group" "ecs_http" {
+  name        = "${var.repo_name}-${var.branch_name}-0"
+  port        = 80
+  protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = data.aws_vpc.vpc.id
 
