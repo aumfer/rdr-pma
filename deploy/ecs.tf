@@ -103,7 +103,7 @@ resource "aws_ecs_service" "default" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.ecs_json_rpc.arn
+    target_group_arn = aws_lb_target_group.ecs_http.arn
     container_name   = "${var.repo_name}-${var.branch_name}"
     container_port   = "80"
   }
