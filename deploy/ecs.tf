@@ -106,11 +106,11 @@ resource "aws_ecs_service" "default" {
     assign_public_ip = true
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.ecs_http.arn
-    container_name   = "${var.repo_name}-${var.branch_name}"
-    container_port   = "80"
-  }
+  #load_balancer {
+  #  target_group_arn = aws_lb_target_group.ecs_http.arn
+  #  container_name   = "${var.repo_name}-${var.branch_name}"
+  #  container_port   = "80"
+  #}
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_https.arn
@@ -129,20 +129,20 @@ resource "aws_ecs_service" "default" {
   ]
 }
 
-resource "aws_lb_target_group" "ecs_http" {
-  name        = "${var.repo_name}-${var.branch_name}-0"
-  port        = 80
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.vpc.id
-
-  tags = module.tags.tags
-
-  # workaround for https://github.com/cds-snc/aws-ecs-fargate/issues/1
-  depends_on = [
-      aws_lb.main
-  ]
-}
+#resource "aws_lb_target_group" "ecs_http" {
+#  name        = "${var.repo_name}-${var.branch_name}-0"
+#  port        = 80
+#  protocol    = "HTTP"
+#  target_type = "ip"
+#  vpc_id      = data.aws_vpc.vpc.id
+#
+#  tags = module.tags.tags
+#
+#  # workaround for https://github.com/cds-snc/aws-ecs-fargate/issues/1
+#  depends_on = [
+#      aws_lb.main
+#  ]
+#}
 
 resource "aws_lb_target_group" "ecs_https" {
   name        = "${var.repo_name}-${var.branch_name}-1"
