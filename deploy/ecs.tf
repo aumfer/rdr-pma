@@ -116,6 +116,7 @@ resource "aws_ecs_service" "default" {
     ignore_changes = [desired_count]
   }
 
+  # workaround for https://github.com/hashicorp/terraform/issues/12634
   depends_on = [
     "aws_lb_listener.http",
   ]
