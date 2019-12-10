@@ -13,6 +13,17 @@ module "container_definition" {
   container_name  = "${var.repo_name}-${var.branch_name}"
   container_image = "${var.ecr_repo}:${var.repo_name}-${var.branch_name}-${var.source_rev}"
 
+  port_mappings = [
+    {
+      containerPort = 80
+      protocol      = "tcp"
+    },
+    {
+      containerPort = 443
+      protocol      = "tcp"
+    },
+  ]
+
   log_options = {
     "awslogs-group"         = aws_cloudwatch_log_group.container_logs.name
     "awslogs-region"        = var.aws_region

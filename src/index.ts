@@ -49,7 +49,7 @@ const httpServer = http.createServer(function onRequest(request, response) {
     response.write('hello, world!');
     response.end();
 });
-httpServer.listen(80);
+httpServer.listen(443);
 
 const socketIo = SocketIO(httpServer);
 socketIo.on('connection', function onConnection(socket) {
