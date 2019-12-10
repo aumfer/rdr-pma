@@ -112,6 +112,12 @@ resource "aws_ecs_service" "default" {
     container_port   = "80"
   }
 
+    load_balancer {
+    target_group_arn = aws_lb_target_group.ecs_https.arn
+    container_name   = "${var.repo_name}-${var.branch_name}"
+    container_port   = "443"
+  }
+
   lifecycle {
     ignore_changes = [desired_count]
   }
