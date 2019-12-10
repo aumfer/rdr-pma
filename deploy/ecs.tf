@@ -115,6 +115,10 @@ resource "aws_ecs_service" "default" {
   lifecycle {
     ignore_changes = [desired_count]
   }
+
+  depends_on = [
+    "aws_lb_listener.http",
+  ]
 }
 
 resource "aws_lb_target_group" "ecs_http" {
