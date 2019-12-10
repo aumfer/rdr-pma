@@ -42,15 +42,16 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-data "aws_acm_certificate" "cert" {
-  domain   = "*.alteredco.com"
-}
+#data "aws_acm_certificate" "cert" {
+#  domain   = "*.alteredco.com"
+#}
 
 resource "aws_lb_listener" "https" {
   load_balancer_arn = "${aws_lb.main.arn}"
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = data.aws_acm_certificate.cert.arn
+  #certificate_arn   = data.aws_acm_certificate.cert.arn
+  certificate_arn = "arn:aws:acm:us-east-1:021370510137:certificate/b5933088-78d3-46b4-bf44-efd582040c14"
 
   default_action {
     type = "forward"
