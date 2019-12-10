@@ -12,7 +12,7 @@ module "lb_logs" {
 
 resource "aws_lb" "main" {
   name            = "${var.repo_name}-${var.branch_name}"
-  security_groups = [aws_security_group.security_group.id]
+  security_groups = [data.aws_security_group.security_group.id]
   subnets         = data.aws_subnet_ids.subnets.ids
   # todo internal only
   internal        = false

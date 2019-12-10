@@ -1,0 +1,52 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+      nodejs: 12
+    commands:
+      # set some environment variables
+      # these are all computed from incoming environment variables
+      - TF_VAR_repo_name=`basename $CODEBUILD_SOURCE_REPO_URL`
+      - TF_VAR_repo_name=`echo $TF_VAR_repo_name | tr '[:upper:]' '[:lower:]'`
+      - TF_VAR_repo_name=`echo $TF_VAR_repo_name | sed 's/_/-/g'` # no underscores
+      - TF_VAR_repo_name=`echo $TF_VAR_repo_name | sed 's/\./-/g'` # no dots
+      - TF_VAR_branch_name=`git name-rev $CODEBUILD_RESOLVED_SOURCE_VERSION --name-only`
+      - TF_VAR_branch_name=`basename $TF_VAR_branch_name`
+      - TF_VAR_branch_name=`echo $TF_VAR_branch_name | tr '[:upper:]' '[:lower:]'`
+      - TF_VAR_branch_name=`echo $TF_VAR_branch_name | sed 's/_/-/g'` # no underscores
+      - TF_VAR_branch_name=`echo $TF_VAR_branch_name | sed 's/\./-/g'` # no dots
+      - TF_VAR_ecr_repo=021370510137.dkr.ecr.us-east-1.amazonaws.com/radar
+      - TF_VAR_source_rev=$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - TF_VAR_eth_url=$ETH_URL
+      # todo error if repo_name + branch_name > 63
+      # environment: see TF_VAR_ and CODEBUILD_
+      - cat /etc/os-release
+      - printenv
+      - wget -nv https://releases.hashicorp.com/terraform/0.12.17/terraform_0.12.17_linux_amd64.zip
+      - unzip terraform_0.12.17_linux_amd64.zip
+      - install terraform /usr/local/bin/
+      - terraform --version
+      # node
+      - npm install -g typescript
+  build:
+    commands:
+      # node
+      - npm install
+      - npm run build
+      # docker
+      - eval $(aws ecr get-login --no-include-email)
+      - docker build -q -t $TF_VAR_repo_name-$TF_VAR_branch_name:$TF_VAR_source_rev --build-arg TF_VAR_repo_name=$TF_VAR_repo_name --build-arg TF_VAR_source_rev=$TF_VAR_source_rev .
+      - docker tag $TF_VAR_repo_name-$TF_VAR_branch_name:$TF_VAR_source_rev $TF_VAR_ecr_repo:$TF_VAR_repo_name-$TF_VAR_branch_name-$TF_VAR_source_rev
+      - docker push $TF_VAR_ecr_repo:$TF_VAR_repo_name-$TF_VAR_branch_name-$TF_VAR_source_rev
+  post_build:
+    commands:
+      - cd deploy
+      # needed for tags on ecs services
+      - aws ecs put-account-setting --name serviceLongArnFormat --value enabled
+      - aws ecs put-account-setting --name taskLongArnFormat --value enabled
+      - aws ecs put-account-setting --name containerInstanceLongArnFormat --value enabled
+      - terraform init --backend-config="key=$TF_VAR_repo_name/$TF_VAR_branch_name"
+      - terraform apply -auto-approve
+      #- terraform destroy -auto-approve

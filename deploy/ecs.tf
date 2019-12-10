@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "allow_http_ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.security_group.id
+  security_group_id = data.aws_security_group.security_group.id
 }
 
 resource "aws_security_group_rule" "allow_https_ingress" {
@@ -70,7 +70,7 @@ resource "aws_security_group_rule" "allow_https_ingress" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.security_group.id
+  security_group_id = data.aws_security_group.security_group.id
 }
 
 resource "aws_security_group_rule" "allow_all_egress" {
@@ -79,7 +79,7 @@ resource "aws_security_group_rule" "allow_all_egress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.security_group.id
+  security_group_id = data.aws_security_group.security_group.id
 }
 
 resource "aws_ecs_service" "default" {
@@ -97,7 +97,7 @@ resource "aws_ecs_service" "default" {
   propagate_tags = "SERVICE"
 
   network_configuration {
-    security_groups  = [aws_security_group.security_group.id]
+    security_groups  = [data.aws_security_group.security_group.id]
     subnets          = data.aws_subnet_ids.subnets.ids
     assign_public_ip = true
   }

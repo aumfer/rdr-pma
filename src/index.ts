@@ -13,6 +13,7 @@ const redis = new Redis(redisUrl);
 let lastId = Date.now().toString();
 
 const transactions = new Observable(observer => {
+    console.log(`subscribing to ${redisUrl}`);
     const poll = function poll() {
         redis.xrange('rdr', lastId, '+').then(function onPublishedTransaction(result) {
             // ignore empty responses
@@ -27,6 +28,8 @@ const transactions = new Observable(observer => {
                 console.log(`onPublishedTransaction: ${JSON.stringify(data)}`);
                 observer.next(data);
             });
+        }, function onXrangeError(error) {
+            console.log(`onXrangeError: ${JSON.stringify(error)}`);
         }).finally(function onPollComplete() {
             poll();
         });
