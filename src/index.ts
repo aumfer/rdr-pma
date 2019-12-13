@@ -25,7 +25,7 @@ const transactions = new Observable(observer => {
 
                 lastId = val[0];
                 const data = _.fromPairs(_.chunk(val[1], 2));
-                console.log(`onPublishedTransaction: ${JSON.stringify(data)}`);
+                //console.log(`onPublishedTransaction: ${JSON.stringify(data)}`);
                 observer.next(data);
             });
         }, function onXrangeError(error) {
@@ -53,8 +53,13 @@ httpServer.listen(80);
 
 const socketIo = SocketIO(httpServer);
 socketIo.on('connection', function onConnection(socket) {
-    transactions.subscribe(function onTransactionToSend(transaction) {
-        console.log(`onTransactionToSend: ${JSON.stringify(transaction)}`);
+    console.log(`onConnection: ${socket.id}`);
+    const subscription = transactions.subscribe(function onTransactionToSend(transaction) {
+        //console.log(`onTransactionToSend: ${JSON.stringify(transaction)}`);
         socket.send(transaction);
+    });
+    socket.on('disconnect', function onDisconnect(reason) {
+        console.log(`onConnection: ${socket.id} ${reason}`);
+        subscription.unsubscribe();
     });
 });
