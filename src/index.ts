@@ -46,7 +46,14 @@ transactions.subscribe();
 
 const httpServer = http.createServer(function onRequest(request, response) {
     response.writeHead(200, {'Content-Type': 'text/plain'});
-    response.write('hello, world!');
+    response.write(JSON.stringify({
+        app: process.env.APP,
+        env: process.env.ENV,
+        sha: process.env.SHA,
+        log: {
+            lastId: lastId
+        }
+    }));
     response.end();
 });
 httpServer.listen(80);
@@ -59,7 +66,7 @@ socketIo.on('connection', function onConnection(socket) {
         socket.send(transaction);
     });
     socket.on('disconnect', function onDisconnect(reason) {
-        console.log(`onConnection: ${socket.id} ${reason}`);
+        console.log(`onDisconnect: ${socket.id} ${reason}`);
         subscription.unsubscribe();
     });
 });
